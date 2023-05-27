@@ -1,7 +1,7 @@
 from requests import get
 from bs4 import BeautifulSoup
 
-base_url = "https://www.philstar.com/"
+base_url = "https://tribune.net.ph/?s="
 search_term = "business"
 
 response = get(f"{base_url}{search_term}")
@@ -11,13 +11,18 @@ response = get(f"{base_url}{search_term}")
 if response.status_code != 200:
     print("can't request website")
 else:
+    # print(response)
     soup = BeautifulSoup(response.text, "html.parser")
-    news = soup.find_all('div', class_="tiles")
+    news = soup.find_all('div', class_="border-dark")
     for news_section in news:
-        news_post = news_section.find_all('div', class_="TilesText")
+        news_post = news_section.find_all('div', class_="col-lg-6")
         for post in news_post:
-            div_elements = post.find_all("div")
-            if len(div_elements) > 1: # 두개 이상의 div 요소가 있는지 체크
-                div_elements[1].extract() # 두번째 div 요소를 삭제함
-            print(post)
-            print("/////////////////////")
+            anchors = post.find_all('a')
+            anchor = anchors[1]
+            link = anchor['href']
+            title = anchor.find("h3")
+            subtitle = anchor.find("div")
+            # title, subtitle = anchor.find("h3", "div")
+            print(title, subtitle)
+            print("//////////////////////")
+            print("//////////////////////")
