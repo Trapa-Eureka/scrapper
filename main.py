@@ -53,7 +53,7 @@ else:
 
                         item_data.append({'title': title, 'subtitle': f"{subtitle} - {date}"})
                     except AttributeError:
-                        print("Unable to locate title or subtitle element")
+                        pass  # Skip the item if title or subtitle element is not found
             else:
                 print(f"Unable to request page {page_url}")
 
