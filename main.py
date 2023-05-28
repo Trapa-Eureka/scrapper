@@ -1,3 +1,4 @@
+import csv
 from requests import get
 from bs4 import BeautifulSoup
 
@@ -31,6 +32,14 @@ else:
 
         item_data = []  # Initialize the item data array
 
+        anchor = item_row.find('a')
+
+        if anchor:
+            link = anchor['href']
+            item_data.append({'link': link})
+        else:
+            print("No anchor found in 'item-row-2'")
+
         for page in range(1, total_pages + 1):
             page_url = f"{base_url}{search_term}&page={page}"
             page_response = get(page_url)
@@ -51,7 +60,7 @@ else:
                         date_element = subtitle_element.find('span', class_='roboto-a')
                         date = date_element.get_text(strip=True) if date_element else ""
 
-                        item_data.append({'title': title, 'subtitle': f"{subtitle} - {date}"})
+                        item_data.append({'link': link, 'title': title, 'subtitle': f"{subtitle} - {date}"})
                     except AttributeError:
                         pass  # Skip the item if title or subtitle element is not found
             else:
@@ -60,4 +69,12 @@ else:
         # Remove '\n' from the results
         item_data = [{k: v.replace('\n', '') for k, v in item.items()} for item in item_data]
 
-        print(item_data)
+        # Export the data to a CSV file
+        filename = "search_results.csv"
+        with open(filename, 'w', newline='', encoding='utf-8') as file:
+            fieldnames = ['link', 'title', 'subtitle']
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(item_data)
+
+        print(f"Data exported to {filename}")
